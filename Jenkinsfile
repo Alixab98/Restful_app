@@ -5,11 +5,12 @@ pipeline {
         stage('Build') {
             steps {
                 // Checkout code from Github repository
-                git branch: 'main', url: 'https://github.com/hdubouillon/Resful-ML-endpoint'
+                git branch: 'main', url: 'https://github.com/Alixab98/Restful_app'
 
                 // Build Docker image
                 script {
-                    docker.build('resful-ml-endpoint')
+                    sh 'docker build -t rest_app .'
+                    
                 }
             }
         }
@@ -17,25 +18,18 @@ pipeline {
         stage('Test') {
             steps {
                 // Run unit tests
-                sh 'pytest app/test_main.py'
+                sh 'pytest app/flaskapp/test.py'
             }
         }
 
-        stage('Deploy') {
-            steps {
-                // Start a Docker container from the image
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials-id') {
-                        def customImage = docker.image('your-image-name').push('latest')
-                        customImage.run('-p 5000:5000')
-                    }
+    post {
+    always {
+      sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+      sh 'docker push my-rest_app'
                 }
             }
         }
     }
 
-    // Trigger the pipeline whenever there is a new commit to the Github repository
-    triggers {
-        githubPush()
-    }
+    
 }
