@@ -1,0 +1,6 @@
+pandas
+unittest
+numpy
+flask
+tensorflow
+matplotlib
